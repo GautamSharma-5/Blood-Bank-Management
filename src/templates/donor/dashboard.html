@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Donor Staff Dashboard - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Donor Staff Dashboard</h2>
+        <p class="lead">Welcome back, {{ session.get('username') }}!</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Statistics Cards -->
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Donors</h5>
+                <h2 class="card-text">{{ total_donors }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Recent Donations</h5>
+                <h2 class="card-text">{{ recent_donations }}</h2>
+                <small>Last 30 days</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Blood Type Distribution Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Blood Type Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="bloodTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Donations List -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Donations</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Donor</th>
+                                <th>Blood Type</th>
+                                <th>Units</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donation in recent_donation_list %}
+                            <tr>
+                                <td>{{ donation.first_name }} {{ donation.last_name }}</td>
+                                <td>{{ donation.blood_type }}</td>
+                                <td>{{ donation.units }}</td>
+                                <td>{{ donation.donation_date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Blood Type Distribution Chart
+    const bloodTypeData = {{ blood_type_data|tojson }};
+    const labels = bloodTypeData.map(item => item.blood_type);
+    const data = bloodTypeData.map(item => item.count);
+
+    new Chart(document.getElementById('bloodTypeChart'), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40',
+                    '#FF6384',
+                    '#36A2EB'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

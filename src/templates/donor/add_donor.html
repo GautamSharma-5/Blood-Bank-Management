@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Donor - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Add New Donor</h3>
+                </div>
+                <div class="card-body">
+                    <form id="donorAddForm" action="{{ url_for('donor.add_donor') }}" method="POST" class="needs-validation" novalidate>
+                        <!-- Personal Information -->
+                        <h5 class="text-danger mb-3">Personal Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" class="form-control" name="first_name" required>
+                                <div class="invalid-feedback">Please provide first name</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" name="last_name" required>
+                                <div class="invalid-feedback">Please provide last name</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date of Birth *</label>
+                                <input type="date" class="form-control" name="date_of_birth" required>
+                                <div class="invalid-feedback">Please provide date of birth</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Gender *</label>
+                                <select class="form-select" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+                                </select>
+                                <div class="invalid-feedback">Please select gender</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Blood Type *</label>
+                                <select class="form-select" name="blood_type" required>
+                                    <option value="">Select Blood Type</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                                <div class="invalid-feedback">Please select blood type</div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <h5 class="text-danger mb-3">Contact Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" name="phone" required>
+                                <div class="invalid-feedback">Please provide phone number</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" name="address" rows="2"></textarea>
+                        </div>
+
+                        <!-- Medical Information -->
+                        <h5 class="text-danger mb-3">Medical Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Weight (kg) *</label>
+                                <input type="number" class="form-control" name="weight" required min="0" step="0.1">
+                                <div class="invalid-feedback">Please provide weight in kilograms</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Donation Date</label>
+                                <input type="date" class="form-control" name="last_donation_date">
+                                <small class="text-muted">Leave blank if never donated</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Medical Conditions</label>
+                            <textarea class="form-control" name="medical_conditions" rows="2" placeholder="Enter any medical conditions, or 'None'"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Medications</label>
+                            <textarea class="form-control" name="medications" rows="2" placeholder="List current medications, or 'None'"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                Add Donor
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('donorAddForm');
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Age validation
+    const dobInput = form.querySelector('input[name="date_of_birth"]');
+    dobInput.addEventListener('change', function() {
+        const dob = new Date(this.value);
+        const age = Math.floor((new Date() - dob) / (365.25 * 24 * 60 * 60 * 1000));
+        
+        if (age < 18) {
+            this.setCustomValidity('Donor must be at least 18 years old');
+        } else if (age > 65) {
+            this.setCustomValidity('Donor must be under 65 years old');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+body {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+.text-blood {
+    color: #dc3545 !important;
+}
+
+.bg-blood {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(220, 53, 69, 0.2);
+}
+
+.blood-type-badge {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: #dc3545;
+    color: white;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.btn-blood {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-blood:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    color: white;
+}
+
+.btn-outline-blood {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-blood:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.stat-card {
+    border-left: 4px solid #dc3545;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.form-control:focus {
+    border-color: rgba(220, 53, 69, 0.5);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+footer {
+    margin-top: 50px;
+}
+
+@media (max-width: 768px) {
+    .blood-type-badge {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 1.5rem;
+    }
+}

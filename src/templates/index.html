@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-4">
+        <h1 class="display-4 text-danger">Welcome to Blood Bank Management System</h1>
+        <p class="lead">Connecting donors with those in need - saving lives one donation at a time.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Donate Blood</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Your donation can save up to 3 lives! Register as a donor or schedule your next donation appointment.</p>
+                <ul>
+                    <li>Quick and easy process</li>
+                    <li>Professional medical staff</li>
+                    <li>Safe and hygienic environment</li>
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent border-danger">
+                <a href="{{ url_for('donor.add_donor') }}" class="btn btn-outline-danger">Donate Now</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Search Blood</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Need blood urgently? Check our inventory for available blood units by type, location, and other criteria.</p>
+                <ul>
+                    <li>Real-time inventory status</li>
+                    <li>Search by blood type and location</li>
+                    <li>Emergency request processing</li>
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent border-danger">
+                <a href="{{ url_for('search.search_page') }}" class="btn btn-outline-danger">Search Now</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Blood Drive Events</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Find upcoming blood donation drives in your area or organize one at your institution.</p>
+                <ul>
+                    <li>Community blood drives</li>
+                    <li>Corporate donation events</li>
+                    <li>Educational institutions</li>
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent border-danger">
+                <a href="{{ url_for('donor.list_donors') }}" class="btn btn-outline-danger">View Events</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Blood Donation Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">A+</h3>
+                            <p class="mb-0">30 units</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">B+</h3>
+                            <p class="mb-0">25 units</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">AB+</h3>
+                            <p class="mb-0">15 units</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">O+</h3>
+                            <p class="mb-0">40 units</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">A-</h3>
+                            <p class="mb-0">10 units</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">B-</h3>
+                            <p class="mb-0">8 units</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">AB-</h3>
+                            <p class="mb-0">5 units</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h3 class="text-danger">O-</h3>
+                            <p class="mb-0">20 units</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Why Donate Blood?</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Save Lives:</strong> One donation can save up to three lives.</li>
+                    <li><strong>Health Benefits:</strong> Regular donors have reduced risk of heart disease.</li>
+                    <li><strong>Free Health Check:</strong> Each donation includes a mini health screening.</li>
+                    <li><strong>Community Service:</strong> Give back to your community in a meaningful way.</li>
+                    <li><strong>Emergency Preparedness:</strong> Help maintain adequate blood supply for emergencies.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Any additional JavaScript for the homepage can go here
+</script>
+{% endblock %}

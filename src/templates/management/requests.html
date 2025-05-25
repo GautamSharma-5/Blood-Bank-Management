@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Requests - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Blood Requests Management</h2>
+        <p class="lead">View and process blood requests from hospitals and patients</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">All Blood Requests</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Requester</th>
+                                <th>Blood Type</th>
+                                <th>Units</th>
+                                <th>Available</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in requests %}
+                            <tr>
+                                <td>{{ request.request_id }}</td>
+                                <td>{{ request.requester_name }}</td>
+                                <td><span class="badge bg-danger">{{ request.blood_type }}</span></td>
+                                <td>{{ request.units }}</td>
+                                <td>
+                                    {% if request.available_units >= request.units %}
+                                        <span class="badge bg-success">{{ request.available_units }} units</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">{{ request.available_units }} units</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ request.request_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if request.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif request.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif request.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('management.view_request', request_id=request.request_id) }}" class="btn btn-sm btn-info">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Request Status Summary</h5>
+            </div>
+            <div class="card-body">
+                {% set pending_count = 0 %}
+                {% set approved_count = 0 %}
+                {% set rejected_count = 0 %}
+                
+                {% for request in requests %}
+                    {% if request.status == 'pending' %}
+                        {% set pending_count = pending_count + 1 %}
+                    {% elif request.status == 'approved' %}
+                        {% set approved_count = approved_count + 1 %}
+                    {% elif request.status == 'rejected' %}
+                        {% set rejected_count = rejected_count + 1 %}
+                    {% endif %}
+                {% endfor %}
+                
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="card bg-warning text-dark mb-3">
+                            <div class="card-body">
+                                <h3>{{ pending_count }}</h3>
+                                <p class="mb-0">Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white mb-3">
+                            <div class="card-body">
+                                <h3>{{ approved_count }}</h3>
+                                <p class="mb-0">Approved</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white mb-3">
+                            <div class="card-body">
+                                <h3>{{ rejected_count }}</h3>
+                                <p class="mb-0">Rejected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">Urgent Requests</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% set urgent_count = 0 %}
+                    {% for request in requests %}
+                        {% if request.status == 'pending' and request.urgency == 'high' %}
+                            {% set urgent_count = urgent_count + 1 %}
+                            <li class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">
+                                Urgent request for {{ request.blood_type }} ({{ request.units }} units)
+                                <a href="{{ url_for('management.view_request', request_id=request.request_id) }}" class="btn btn-sm btn-outline-warning">Process</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if urgent_count == 0 %}
+                        <li class="list-group-item list-group-item-success">No urgent requests at this time.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Blood Request - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Emergency Blood Request</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        <h5 class="alert-heading">Important Information</h5>
+                        <p class="mb-0">This form is for emergency blood requests only. Your request will be processed with high priority, and nearby hospitals will be notified immediately.</p>
+                    </div>
+
+                    <form id="emergencyRequestForm" class="needs-validation" novalidate>
+                        <!-- Requester Information -->
+                        <h5 class="text-danger mb-3">Requester Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Your Name *</label>
+                                <input type="text" class="form-control" name="requester_name" required>
+                                <div class="invalid-feedback">Please provide your name</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Number *</label>
+                                <input type="tel" class="form-control" name="requester_contact" required>
+                                <div class="invalid-feedback">Please provide a contact number</div>
+                            </div>
+                        </div>
+
+                        <!-- Patient Information -->
+                        <h5 class="text-danger mb-3">Patient Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Patient Name *</label>
+                                <input type="text" class="form-control" name="patient_name" required>
+                                <div class="invalid-feedback">Please provide patient name</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Blood Type Required *</label>
+                                <select class="form-select" name="blood_type" required>
+                                    <option value="">Select Blood Type</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                                <div class="invalid-feedback">Please select blood type</div>
+                            </div>
+                        </div>
+
+                        <!-- Request Details -->
+                        <h5 class="text-danger mb-3">Request Details</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Units Required *</label>
+                                <input type="number" class="form-control" name="units" min="1" required>
+                                <div class="invalid-feedback">Please specify number of units</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Urgency Level *</label>
+                                <select class="form-select" name="urgency" required>
+                                    <option value="normal">Normal</option>
+                                    <option value="urgent">Urgent</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                                <div class="invalid-feedback">Please select urgency level</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Preferred Hospital *</label>
+                            <select class="form-select" name="hospital" required>
+                                <option value="">Select Hospital</option>
+                                {% for hospital in hospitals %}
+                                <option value="{{ hospital.hospital_id }}">
+                                    {{ hospital.name }} 
+                                    {% if hospital.available_blood %}
+                                        (Available: {{ hospital.available_blood }})
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select a hospital</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                    placeholder="Any additional information that might be helpful..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                Submit Emergency Request
+                            </button>
+                            <a href="{{ url_for('search.search_page') }}" class="btn btn-outline-secondary">
+                                Back to Search
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('emergencyRequestForm');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        if (!form.checkValidity()) {
+            event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            // Convert units to number explicitly
+            if (key === 'units') {
+                data[key] = parseInt(value, 10);
+            } else {
+                data[key] = value;
+            }
+        });
+
+        fetch("{{ url_for('search.emergency_request') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Server responded with status: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                // Show available hospitals if any
+                if (data.available_hospitals && data.available_hospitals.length > 0) {
+                    const hospitals = data.available_hospitals
+                        .map(h => `${h.name}: ${h.units} units`)
+                        .join('\n');
+                    alert(`Request submitted successfully!\n\nAvailable hospitals:\n${hospitals}`);
+                } else {
+                    alert('Request submitted successfully!');
+                }
+                
+                // Redirect to request status page
+                window.location.href = `/search/request-status/${data.request_id}`;
+            } else {
+                alert(data.message || 'An error occurred while submitting your request');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting your request: ' + error.message);
+        });
+    });
+});
+</script>
+{% endblock %}

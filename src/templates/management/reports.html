@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Blood Bank Reports{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Blood Bank Reports</h2>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Blood Inventory Trends</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="inventoryTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Blood Type Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="bloodTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Activity Log</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Blood Type</th>
+                                <th>Change</th>
+                                <th>Type</th>
+                                <th>Updated By</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityLog">
+                            <!-- Will be populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Fetch and render inventory trend data
+    fetch('/management/api/inventory-trend')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('inventoryTrendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.dates,
+                    datasets: data.bloodTypes.map((type, index) => ({
+                        label: type,
+                        data: data.units[index],
+                        borderColor: getColor(index),
+                        fill: false
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Units'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    // Fetch and render blood type distribution
+    fetch('/management/api/blood-distribution')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('bloodTypeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.bloodTypes,
+                    datasets: [{
+                        data: data.units,
+                        backgroundColor: data.bloodTypes.map((_, index) => getColor(index))
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        });
+
+    // Fetch and render activity log
+    fetch('/management/api/activity-log')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('activityLog');
+            data.activities.forEach(activity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(activity.date)}</td>
+                    <td>${activity.blood_type}</td>
+                    <td>${activity.change}</td>
+                    <td>${activity.type}</td>
+                    <td>${activity.updated_by}</td>
+                    <td>${activity.notes}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+
+    // Helper functions
+    function getColor(index) {
+        const colors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+            '#9966FF', '#FF9F40', '#FF6384', '#36A2EB'
+        ];
+        return colors[index % colors.length];
+    }
+
+    function formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+</script>
+{% endblock %}

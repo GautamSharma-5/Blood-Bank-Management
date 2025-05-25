@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Donation - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Record New Donation</h2>
+        <p class="lead">Record a new blood donation from a registered donor</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Donation Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('donor.add_donation') }}">
+                    <div class="mb-3">
+                        <label for="donor_id" class="form-label">Select Donor</label>
+                        <select class="form-select" id="donor_id" name="donor_id" required>
+                            <option value="">Choose a donor...</option>
+                            {% for donor in donors %}
+                            <option value="{{ donor.donor_id }}">{{ donor.first_name }} {{ donor.last_name }} ({{ donor.blood_type }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="units" class="form-label">Units Donated</label>
+                        <input type="number" class="form-control" id="units" name="units" min="1" max="4" required>
+                        <small class="text-muted">Standard donation is typically 1 unit (450-500ml)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="donation_date" class="form-label">Donation Date</label>
+                        <input type="date" class="form-control" id="donation_date" name="donation_date" value="{{ today }}" max="{{ today }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">Record Donation</button>
+                        <a href="{{ url_for('donor.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

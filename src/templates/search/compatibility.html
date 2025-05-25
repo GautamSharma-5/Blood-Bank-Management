@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Compatibility Chart - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12 text-center">
+        <h2>Blood Type Compatibility Chart</h2>
+        <p class="lead">Understanding blood type compatibility is crucial for safe transfusions</p>
+    </div>
+</div>
+
+<div class="row justify-content-center mb-5">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Compatibility Information</h5>
+            </div>
+            <div class="card-body">
+                <p>Blood type compatibility is determined by antigens on red blood cells and antibodies in plasma. Understanding these relationships is essential for safe blood transfusions:</p>
+                
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Blood Type</th>
+                                <th>Can Donate To</th>
+                                <th>Can Receive From</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>O-</strong></td>
+                                <td>All blood types (Universal Donor)</td>
+                                <td>O- only</td>
+                            </tr>
+                            <tr>
+                                <td><strong>O+</strong></td>
+                                <td>O+, A+, B+, AB+</td>
+                                <td>O+, O-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>A-</strong></td>
+                                <td>A-, A+, AB-, AB+</td>
+                                <td>A-, O-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>A+</strong></td>
+                                <td>A+, AB+</td>
+                                <td>A+, A-, O+, O-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B-</strong></td>
+                                <td>B-, B+, AB-, AB+</td>
+                                <td>B-, O-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B+</strong></td>
+                                <td>B+, AB+</td>
+                                <td>B+, B-, O+, O-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AB-</strong></td>
+                                <td>AB-, AB+</td>
+                                <td>AB-, A-, B-, O-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AB+</strong></td>
+                                <td>AB+ only</td>
+                                <td>All blood types (Universal Recipient)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Important Facts</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Type O negative blood is considered the universal donor type because it can be given to anyone in an emergency.</li>
+                    <li>Type AB positive blood is known as the universal recipient type because people with this type can receive any blood type.</li>
+                    <li>The Rh factor (+ or -) is another important consideration in blood compatibility.</li>
+                    <li>In emergency situations, O- blood may be used until the patient's blood type is determined.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">Need Blood?</h5>
+            </div>
+            <div class="card-body">
+                <p>If you need blood for a medical procedure or emergency:</p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('search.search_page') }}" class="btn btn-outline-danger">Search Available Blood</a>
+                    <a href="{{ url_for('search.emergency_request') }}" class="btn btn-danger">Submit Emergency Request</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Visual Compatibility Chart</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='img/blood-compatibility-chart.png') }}" alt="Blood Compatibility Chart" class="img-fluid" onerror="this.onerror=null; this.src='https://www.redcrossblood.org/content/dam/redcrossblood/rcb/blood-types/blood-types-compatibility-chart.png.transform/1288/q70/feature/image.png'; this.alt='Blood Compatibility Chart (External)'">
+                <p class="mt-3"><small>Note: This chart is for informational purposes only. Always consult healthcare professionals for medical advice.</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

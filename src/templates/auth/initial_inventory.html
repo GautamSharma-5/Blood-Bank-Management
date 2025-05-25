@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Initial Inventory Setup - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Initial Inventory Setup</h2>
+        <p class="lead">Please set up your initial blood inventory levels</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Blood Inventory Levels</h5>
+            </div>
+            <div class="card-body">
+                <form id="initialInventoryForm" method="POST" action="{{ url_for('auth.setup_initial_inventory') }}" class="needs-validation" novalidate>
+                    {% for blood_type in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                    <div class="mb-3">
+                        <label for="{{ blood_type }}" class="form-label">{{ blood_type }} Blood Type Units</label>
+                        <input type="number" class="form-control" id="{{ blood_type }}" name="{{ blood_type }}" min="0" required>
+                        <div class="invalid-feedback">
+                            Please enter a valid number of units (0 or more)
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Submit Inventory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('initialInventoryForm');
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}

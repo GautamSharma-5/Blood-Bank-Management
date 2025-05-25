@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Management Dashboard - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Management Dashboard</h2>
+        <p class="lead">Welcome back, {{ session.get('username') }}!</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Statistics Cards -->
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Blood Units</h5>
+                <h2 class="card-text">{{ total_units }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Recent Requests</h5>
+                <h2 class="card-text">{{ recent_requests }}</h2>
+                <small>Last 30 days</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Blood Inventory Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Blood Inventory</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="inventoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Requests List -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Blood Requests</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Requester</th>
+                                <th>Blood Type</th>
+                                <th>Units</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in recent_request_list %}
+                            <tr>
+                                <td>{{ request.request_id }}</td>
+                                <td>{{ request.requester_name }}</td>
+                                <td>{{ request.blood_type }}</td>
+                                <td>{{ request.units }}</td>
+                                <td>
+                                    {% if request.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif request.status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                    {% elif request.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Quick Actions -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('management.inventory') }}" class="btn btn-primary w-100">Manage Inventory</a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('management.list_requests') }}" class="btn btn-success w-100">View Requests</a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('management.reports') }}" class="btn btn-info w-100">Generate Reports</a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('management.expiry_tracking') }}" class="btn btn-warning w-100">Expiry Tracking</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Blood Inventory Chart
+    const inventoryData = {{ inventory_data|tojson }};
+    const labels = inventoryData.map(item => item.blood_type);
+    const data = inventoryData.map(item => item.units);
+
+    new Chart(document.getElementById('inventoryChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Units Available',
+                data: data,
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40',
+                    '#FF6384',
+                    '#36A2EB'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

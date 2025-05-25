@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-danger mb-4">Blood Availability Search Results</h2>
+    
+    <!-- Summary Section -->
+    <div class="card mb-4 border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Search Summary</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    {% if blood_type %}
+                        <p><strong>Blood Type:</strong> {{ blood_type }}</p>
+                        <p><strong>Total Available Units:</strong> {{ blood_type_totals.get(blood_type, 0) }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {% if location %}
+                        <p><strong>Location:</strong> {{ location }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    {% if results %}
+        <div class="row">
+            {% for result in results %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-danger">
+                        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ result.hospital_name }}</h5>
+                            <span class="badge bg-light text-danger">
+                                {{ result.units }} units available
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-danger">Blood Information</h6>
+                                <p class="mb-1"><strong>Type:</strong> {{ result.blood_type }}</p>
+                                <p class="mb-1"><strong>Collection Date:</strong> {% if result.collection_date %}{{ result.collection_date.strftime('%Y-%m-%d') }}{% else %}Not available{% endif %}</p>
+                                <p class="mb-1"><strong>Expiry Date:</strong> {% if result.expiry_date %}{{ result.expiry_date.strftime('%Y-%m-%d') }}{% else %}Not available{% endif %}</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-danger">Hospital Details</h6>
+                                <p class="mb-1"><strong>Address:</strong> {{ result.address }}</p>
+                                <p class="mb-1"><strong>Phone:</strong> {{ result.phone }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ result.email }}</p>
+                                <p class="mb-1"><strong>Operating Hours:</strong> {{ result.operating_hours }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="text-danger">Emergency Contact</h6>
+                                <p class="mb-1">{{ result.emergency_contact }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-danger">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-danger" 
+                                        onclick="requestBlood('{{ result.hospital_id }}', '{{ result.blood_type }}', {{ result.units }})">
+                                    Request Blood
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">No Results Found</h4>
+            <p>We couldn't find any blood units matching your search criteria. Please try:</p>
+            <ul>
+                <li>Searching for a different blood type</li>
+                <li>Expanding your search location</li>
+                <li>Contacting nearby hospitals directly for emergency cases</li>
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Emergency Request Section -->
+    <div class="card mt-4 border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Need Blood Urgently?</h5>
+        </div>
+        <div class="card-body">
+            <p>If you need blood immediately, you can:</p>
+            <div class="d-grid gap-2 d-md-flex">
+                <a href="{{ url_for('search.emergency_request') }}" class="btn btn-danger">
+                    Submit Emergency Request
+                </a>
+                <button class="btn btn-outline-danger" onclick="showCompatibilityChart()">
+                    View Blood Compatibility Chart
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Blood Request Modal -->
+<div class="modal fade" id="requestModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Request Blood</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="requestForm">
+                    <div class="mb-3">
+                        <label class="form-label">Hospital</label>
+                        <input type="text" id="hospitalName" class="form-control" readonly>
+                        <input type="hidden" id="hospitalId" name="hospital" value="">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Blood Type</label>
+                        <input type="text" id="bloodType" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Units Available</label>
+                        <input type="number" id="unitsAvailable" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Units Needed</label>
+                        <input type="number" id="unitsNeeded" class="form-control" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Urgency Level</label>
+                        <select class="form-select" id="urgencyLevel" required>
+                            <option value="normal">Normal</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="submitRequest()">Submit Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function requestBlood(hospital, bloodType, units) {
+        document.getElementById('hospitalName').value = hospital;
+        document.getElementById('hospitalId').value = hospital;
+        document.getElementById('bloodType').value = bloodType;
+        document.getElementById('unitsAvailable').value = units;
+        document.getElementById('unitsNeeded').value = 1;
+        
+        new bootstrap.Modal(document.getElementById('requestModal')).show();
+    }
+
+    function submitRequest() {
+        const formData = {
+            requester_name: prompt('Your Name:', ''),
+            requester_contact: prompt('Your Contact Number:', ''),
+            patient_name: prompt('Patient Name:', ''),
+            hospital: document.getElementById('hospitalId').value,
+            blood_type: document.getElementById('bloodType').value,
+            units: document.getElementById('unitsNeeded').value,
+            urgency: document.getElementById('urgencyLevel').value,
+            notes: document.getElementById('notes').value
+        };
+
+        // Validate required fields
+        if (!formData.requester_name || !formData.requester_contact || !formData.patient_name) {
+            alert('Please provide all required information');
+            return;
+        }
+
+        fetch("{{ url_for('search.emergency_request') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.href = `/search/request-status/${data.request_id}`;
+            } else {
+                alert(data.message || 'An error occurred while submitting your request');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting your request: ' + error.message);
+        });
+    }
+
+    function showCompatibilityChart() {
+        window.location.href = "{{ url_for('search.compatibility_chart') }}";
+    }
+</script>
+{% endblock %}

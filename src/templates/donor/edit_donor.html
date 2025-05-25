@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Donor - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Edit Donor</h2>
+        <p class="lead">Update information for donor #{{ donor.donor_id }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Donor Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('donor.edit_donor', donor_id=donor.donor_id) }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ donor.first_name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ donor.last_name }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="blood_type" class="form-label">Blood Type</label>
+                                <select class="form-select" id="blood_type" name="blood_type" required>
+                                    {% for type in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                    <option value="{{ type }}" {% if type == donor.blood_type %}selected{% endif %}>{{ type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="M" {% if donor.gender == 'M' %}selected{% endif %}>Male</option>
+                                    <option value="F" {% if donor.gender == 'F' %}selected{% endif %}>Female</option>
+                                    <option value="Other" {% if donor.gender == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ donor.date_of_birth.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ donor.phone }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ donor.email }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" required>{{ donor.address }}</textarea>
+                    </div>
+
+                    <div class="card mt-4 mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Medical Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="weight" class="form-label">Weight (kg)</label>
+                                        <input type="number" step="0.1" class="form-control" id="weight" name="weight" value="{{ donor.weight }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medical_conditions" class="form-label">Medical Conditions</label>
+                                <textarea class="form-control" id="medical_conditions" name="medical_conditions" rows="3">{{ donor.medical_conditions }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medications" class="form-label">Current Medications</label>
+                                <textarea class="form-control" id="medications" name="medications" rows="3">{{ donor.medications }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('donor.view_donor', donor_id=donor.donor_id) }}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

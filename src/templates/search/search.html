@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Blood - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12 text-center">
+        <h2>Search Blood Availability</h2>
+        <p class="lead">Find blood units available at hospitals and blood banks near you</p>
+    </div>
+</div>
+
+<div class="row justify-content-center mb-5">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Search Form</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('search.search_results') }}" method="get">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="blood_type" class="form-label">Blood Type</label>
+                            <select name="blood_type" id="blood_type" class="form-select">
+                                <option value="">All Blood Types</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" name="location" id="location" class="form-control" placeholder="City, Hospital Name, etc.">
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-danger">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Blood Compatibility Chart</h5>
+            </div>
+            <div class="card-body">
+                <p>Understanding blood type compatibility is crucial for transfusions:</p>
+                <ul>
+                    <li><strong>Type O-</strong>: Universal donor (can donate to all blood types)</li>
+                    <li><strong>Type AB+</strong>: Universal recipient (can receive all blood types)</li>
+                    <li><strong>Type A</strong>: Can receive from A and O</li>
+                    <li><strong>Type B</strong>: Can receive from B and O</li>
+                </ul>
+                <a href="{{ url_for('search.compatibility_chart') }}" class="btn btn-outline-info">View Full Compatibility Chart</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">Emergency Request</h5>
+            </div>
+            <div class="card-body">
+                <p>Need blood urgently? Submit an emergency blood request:</p>
+                <ul>
+                    <li>Fast processing for critical situations</li>
+                    <li>Direct notification to nearby donors</li>
+                    <li>Priority handling by blood bank staff</li>
+                </ul>
+                <a href="{{ url_for('search.emergency_request') }}" class="btn btn-outline-warning">Submit Emergency Request</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Current Blood Availability</h5>
+            </div>
+            <div class="card-body">
+                <div id="availability-chart" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Fetch blood availability data from API
+    fetch('{{ url_for("search.api_blood_availability") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const bloodTypes = Object.keys(data.data);
+                const units = Object.values(data.data);
+                
+                new Chart(document.getElementById('availability-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: bloodTypes,
+                        datasets: [{
+                            label: 'Available Units',
+                            data: units,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                                '#9966FF', '#FF9F40', '#FF6384', '#36A2EB'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Units Available'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Blood Type'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching blood availability data:', error));
+</script>
+{% endblock %}

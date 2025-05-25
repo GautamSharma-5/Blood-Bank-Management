@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Donation Details - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Donation Details</h2>
+        <p class="lead">Viewing information for donation #{{ donation.donation_id }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Donation Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Donor Name:</strong> {{ donation.first_name }} {{ donation.last_name }}</p>
+                        <p><strong>Blood Type:</strong> <span class="badge bg-danger">{{ donation.blood_type }}</span></p>
+                        <p><strong>Units Donated:</strong> {{ donation.units }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Donation Date:</strong> {{ donation.donation_date.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge {% if donation.status == 'Available' %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ donation.status }}
+                            </span>
+                        </p>
+                        <p><strong>Notes:</strong> {{ donation.notes if donation.notes else 'No notes available' }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('donor.list_donations') }}" class="btn btn-secondary">Back to Donations</a>
+                    <a href="{{ url_for('donor.view_donor', donor_id=donation.donor_id) }}" class="btn btn-primary">View Donor Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

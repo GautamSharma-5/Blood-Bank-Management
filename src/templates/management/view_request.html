@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}View Blood Request - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Blood Request Details</h2>
+        <p class="lead">Request ID: {{ request.request_id }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Request Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Requester Name:</strong> {{ request.requester_name }}</p>
+                        <p><strong>Requester Contact:</strong> {{ request.requester_contact }}</p>
+                        <p><strong>Patient Name:</strong> {{ request.patient_name }}</p>
+                        <p><strong>Hospital:</strong> {{ request.hospital }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Blood Type:</strong> <span class="badge bg-danger">{{ request.blood_type }}</span></p>
+                        <p><strong>Units Requested:</strong> {{ request.units }}</p>
+                        <p><strong>Available Units:</strong> {{ available_units }}</p>
+                        <p><strong>Request Date:</strong> {{ request.request_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <p><strong>Urgency:</strong> 
+                            {% if request.urgency == 'high' %}
+                                <span class="badge bg-danger">High</span>
+                            {% elif request.urgency == 'medium' %}
+                                <span class="badge bg-warning">Medium</span>
+                            {% else %}
+                                <span class="badge bg-info">Normal</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Status:</strong> 
+                            {% if request.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif request.status == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif request.status == 'rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p><strong>Notes:</strong></p>
+                        <p>{{ request.notes or 'No notes provided.' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Process Request</h5>
+            </div>
+            <div class="card-body">
+                {% if request.status == 'pending' %}
+                    <form action="{{ url_for('management.process_request', request_id=request.request_id) }}" method="post">
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Processing Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any notes about this decision"></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            {% if available_units >= request.units %}
+                                <button type="submit" name="action" value="approve" class="btn btn-success">Approve Request</button>
+                            {% else %}
+                                <button type="submit" name="action" value="approve" class="btn btn-success" disabled>Approve Request</button>
+                                <div class="alert alert-warning" role="alert">
+                                    Not enough units available to approve this request.
+                                </div>
+                            {% endif %}
+                            <button type="submit" name="action" value="reject" class="btn btn-danger">Reject Request</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        This request has already been processed.
+                    </div>
+                    <p><strong>Processed by:</strong> {{ request.processed_by }}</p>
+                    <p><strong>Processed at:</strong> {{ request.processed_at.strftime('%Y-%m-%d %H:%M') if request.processed_at else 'N/A' }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('management.list_requests') }}" class="btn btn-secondary">Back to All Requests</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
